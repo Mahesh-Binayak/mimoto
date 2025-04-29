@@ -1,7 +1,7 @@
 [![Maven Package upon a push](https://github.com/mosip/mimoto/actions/workflows/push-trigger.yml/badge.svg?branch=master)](https://github.com/mosip/mimoto/actions/workflows/push-trigger.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mosip_mimoto&id=mosip_mimoto&metric=alert_status)](https://sonarcloud.io/project/overview?id=mosip_mimoto)
 
-# mimoto
+## mimoto
 
 ## Overview
 This repository contains source code for backend service of Inji Mobile and Inji Web. The modules exposes API endpoints.
