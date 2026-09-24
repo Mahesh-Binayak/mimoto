@@ -36,6 +36,30 @@ onboarding:
     - name: mimoto-oidc
       enabled: true
 
+  # If custom values are required for the Mimoto partners, update the block below as needed.
+  # Only the keys listed here override the onboarder image's baked-in defaults
+  # (mosip-onboarding properties/<module>.properties). Rendered into a plain ConfigMap, so do not
+  # put URLs, Keycloak admin credentials or client secrets here.
+  propertiesOverride:
+    mimoto-keybinding:
+      POLICY_NAME: mpolicy-default-mimotokeybinding
+      POLICY_GROUP_NAME: mpolicygroup-default-mimotokeybinding
+      PARTNER_KC_USERNAME: mpartner-default-mimotokeybinding
+      PARTNER_ORGANIZATION_NAME: IITB
+      PARTNER_TYPE: Auth_Partner
+      PARTNER_DOMAIN: Auth
+    mimoto-oidc:
+      POLICY_NAME: mpolicy-default-mimotooidc
+      POLICY_GROUP_NAME: mpolicygroup-default-mimotooidc
+      PARTNER_KC_USERNAME: mpartner-default-mimotooidc
+      PARTNER_ORGANIZATION_NAME: IITB
+      PARTNER_TYPE: Auth_Partner
+      PARTNER_DOMAIN: Auth
+      OIDC_CLIENT_NAME: mimoto-oidc
+      # Leave LOGO_URI/REDIRECT_URIS unset to keep the defaults derived from mosip-api-host.
+      # LOGO_URI: https://<mosip-api-host>/inji/inji-home-logo.png
+      # REDIRECT_URIS: <comma-separated redirect URIs>
+
 #  configmaps:
 #    s3:
 #      s3-host: 'http://minio.minio:9000'

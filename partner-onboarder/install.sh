@@ -36,7 +36,9 @@ fi
           echo "S3 access key not provided; EXITING;"
           exit 1;
         fi
-        read -p "Please provide S3 secret key: " s3_secret_key
+        echo "Please provide S3 secret key"
+        read -s -p "" s3_secret_key
+        echo
         if [[ -z $s3_secret_key ]]; then
           echo "S3 secret key not provided; EXITING;"
           exit 1;
@@ -89,7 +91,7 @@ fi
   fi
 
   export NS=$custom_ns
-  CHART_VERSION=1.3.1
+  CHART_VERSION=1.4.0
 
   echo Create $NS namespace
   kubectl create ns $NS || true
@@ -135,6 +137,10 @@ fi
     kubectl -n config-server rollout status deployment config-server
 
     echo Reports are moved to S3 under onboarder bucket
+
+    echo "Cleaning up configmaps created for this run..."
+    kubectl -n $NS delete configmap mimoto-partner-onboarder-mimoto-keybinding-properties-mimoto-partner-onboarder --ignore-not-found=true
+    kubectl -n $NS delete configmap mimoto-partner-onboarder-mimoto-oidc-properties-mimoto-partner-onboarder --ignore-not-found=true
     return 0
   fi
 }
