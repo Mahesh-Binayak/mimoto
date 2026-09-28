@@ -93,6 +93,14 @@ fi
   export NS=$custom_ns
   CHART_VERSION=1.4.0
 
+  # Secrets the onboarder writes the Mimoto partner results into. Passed to the onboarder
+  # via propertiesOverride and reused below for the config-server copy, so the names are
+  # defined in one place. MIMOTO_OIDC_KEYSTORE_SECRET_NAME must match
+  # volumes.secrets.mimotooidc in the mimoto helm chart.
+  MIMOTO_KEYBINDING_APIKEY_SECRET_NAME=mimoto-wallet-binding-partner-api-key
+  MIMOTO_OIDC_CLIENTID_SECRET_NAME=mimoto-oidc-partner-clientid
+  MIMOTO_OIDC_KEYSTORE_SECRET_NAME=mimotooidc
+
   echo Create $NS namespace
   kubectl create ns $NS || true
 
@@ -117,6 +125,9 @@ fi
     --set extraEnvVarsCM[0]=global \
     --set extraEnvVarsCM[1]=keycloak-env-vars \
     --set extraEnvVarsCM[2]=keycloak-host \
+    --set onboarding.propertiesOverride.mimoto-keybinding.MIMOTO_KEYBINDING_APIKEY_SECRET_NAME=$MIMOTO_KEYBINDING_APIKEY_SECRET_NAME \
+    --set onboarding.propertiesOverride.mimoto-oidc.MIMOTO_OIDC_CLIENTID_SECRET_NAME=$MIMOTO_OIDC_CLIENTID_SECRET_NAME \
+    --set onboarding.propertiesOverride.mimoto-oidc.MIMOTO_OIDC_KEYSTORE_SECRET_NAME=$MIMOTO_OIDC_KEYSTORE_SECRET_NAME \
     $ENABLE_INSECURE \
     -f values.yaml \
     --version $CHART_VERSION \
@@ -127,10 +138,10 @@ fi
     ./copy_cm_func.sh secret mimoto-oidc-keystore-password $NS config-server
 
     echo Updating Mimoto wallet binding partner api key and Mimoto OIDC Partner Client ID
-    ./copy_cm_func.sh secret mimoto-wallet-binding-partner-api-key $NS config-server
-    ./copy_cm_func.sh secret mimoto-oidc-partner-clientid $NS config-server
-    kubectl -n config-server set env --keys=mimoto-wallet-binding-partner-api-key --from secret/mimoto-wallet-binding-partner-api-key deployment/config-server --prefix=SPRING_CLOUD_CONFIG_SERVER_OVERRIDES_
-    kubectl -n config-server set env --keys=mimoto-oidc-partner-clientid --from secret/mimoto-oidc-partner-clientid deployment/config-server --prefix=SPRING_CLOUD_CONFIG_SERVER_OVERRIDES_
+    ./copy_cm_func.sh secret $MIMOTO_KEYBINDING_APIKEY_SECRET_NAME $NS config-server
+    ./copy_cm_func.sh secret $MIMOTO_OIDC_CLIENTID_SECRET_NAME $NS config-server
+    kubectl -n config-server set env --keys=mimoto-wallet-binding-partner-api-key --from secret/$MIMOTO_KEYBINDING_APIKEY_SECRET_NAME deployment/config-server --prefix=SPRING_CLOUD_CONFIG_SERVER_OVERRIDES_
+    kubectl -n config-server set env --keys=mimoto-oidc-partner-clientid --from secret/$MIMOTO_OIDC_CLIENTID_SECRET_NAME deployment/config-server --prefix=SPRING_CLOUD_CONFIG_SERVER_OVERRIDES_
     kubectl -n config-server set env --keys=mimoto-oidc-keystore-password --from secret/mimoto-oidc-keystore-password deployment/config-server --prefix=SPRING_CLOUD_CONFIG_SERVER_OVERRIDES_
 
     kubectl -n config-server rollout restart deployment config-server
